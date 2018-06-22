@@ -1,0 +1,88 @@
+#set -x
+cp $1 filecompilador.lv
+error=1;
+
+#Limpia archivo de codigo intermedio
+cat /dev/null > intermedio.lv
+
+
+
+parsea()
+{
+
+# $1 es el token
+# $2 es la linea leida
+# $3 es el total de lineas
+
+
+echo $1 $2 $3
+
+###inicio-answer
+if echo "$1" | egrep -q 'inicio'; then 
+	echo "linea numero : $2 contenido: $1 . <- Esto es un Answer" 
+    	echo "exten => _100,1,Answer()" >> intermedio.lv
+	error=0
+	fi
+##playback - playback
+if echo "$1" | egrep -q 'playback'; then
+        echo "linea numero : $2 contenido: $1 . <- Es un audio para ser reproducido en el sistema"
+        #audio=$(echo $1 | tr ";" "\n")
+	audio=$(echo $1 | /usr/bin/awk '{print $2}')
+	echo $audio
+	echo 'exten => _100,n,BackGround('$audio')' >> intermedio.lv
+	error=0
+        fi
+
+##opcion 
+if echo "$1" | egrep -q 'opcion'; then
+        echo "linea nume:ro : $2 contenido: $1 . <- Esto es una opcion "
+        opcion=$(echo $1 | /usr/bin/awk '{print $2}')
+	echo 'exten =>' $opcion',1,Dial(SIP/400,300,Ttr)' >> intermedio.lv 
+	error=0
+        fi
+
+##dial
+if echo "$1" | egrep -q 'dial'; then
+        echo "linea numero : $2 contenido: $1 . <- Esto es marcar a una extension"
+	dial=$(echo $1 | /usr/bin/awk '{print $2}')
+	echo 
+	error=0
+        fi
+
+##opcion
+if echo "$1" | egrep -q 'fin'; then
+        echo "linea numero : $2 contenido: $1 . <- Esto es un Hangup() "
+        error=0
+        fi
+
+
+##caso de error
+if [ $error -eq 1 ]  ; then
+	echo "linea numero : $2 contenido: $1 ESTE COMANDO NO SE PUEDE DEFINIR!!ERR0R "
+	/bin/kill -9 `/bin/ps ax | /bin/grep lexico | /bin/cut -c-5`
+	fi
+error=1
+
+}
+
+
+##Leemos el archivo  linea por linea
+echo -e "\n                                                        Inicia compilador\n"
+
+#obtenemos total de lineas del archivo
+totallineas=$(/usr/bin/wc Instrucciones.compilador   | /usr/bin/awk '{print $1}')
+echo El total de lineas de este codigo es de : $totallineas
+echo
+lineas=1
+while read line; 
+	do #echo -e "$line"
+	echo "******************************************************************"
+	echo $line
+	parsea "$line" $lineas $totallineas
+	lineas=$((lineas + 1))  
+	done < filecompilador.lv
+echo 
+echo
+echo "Ejecutar el siguiente comando para convertir codigo intermedio a formato de asterisk    ./intermedio2asterisk intermedio.lv "
+echo
+echo

@@ -1,0 +1,13 @@
+set -x
+cp $1 intermediotemporal.lv
+cat /dev/null > /etc/asterisk/extensions_custom.conf
+
+
+echo "[from-internal-custom]" > /etc/asterisk/extensions_custom.conf
+while read line; 
+	do #echo -e "$line"
+	#generatokens "$line" $lineas $totallineas
+	lineas=$((lineas + 1)) 
+	echo $line >> /etc/asterisk/extensions_custom.conf
+	done < intermedio.lv
+

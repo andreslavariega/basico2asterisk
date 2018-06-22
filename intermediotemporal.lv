@@ -1,0 +1,7 @@
+exten => _100,1,Answer()
+exten => _100,n,BackGround(bienvenida)
+exten => _100,n,BackGround(confidencialidad)
+exten => _100,n,BackGround(menu)
+exten => 1,1,Dial(SIP/400,300,Ttr)
+exten => 2,1,Dial(SIP/400,300,Ttr)
+exten => 3,1,Dial(SIP/400,300,Ttr)

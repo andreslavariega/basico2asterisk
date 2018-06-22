@@ -1,0 +1,11 @@
+;Area de definicion de variables
+audio bienvenida
+audio confidencialidad
+audio opciones
+int 1
+int 2
+int 3
+dial x=100
+dial y=200
+dial z=300
+Instrucciones
